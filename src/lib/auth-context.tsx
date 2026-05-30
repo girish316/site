@@ -1,6 +1,15 @@
 "use client";
+
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { User, onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
+import {
+  User,
+  onAuthStateChanged,
+  signInWithRedirect,
+  getRedirectResult,
+  signOut,
+  browserLocalPersistence,
+  setPersistence,
+} from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
 
 interface AuthCtx {
@@ -13,23 +22,55 @@ interface AuthCtx {
 
 const AuthContext = createContext<AuthCtx>({} as AuthCtx);
 
-const ADMIN_EMAILS = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "").split(",").map(e => e.trim());
+const ADMIN_EMAILS = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "")
+  .split(",")
+  .map((e) => e.trim().toLowerCase())
+  .filter(Boolean);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    return onAuthStateChanged(auth, (u) => {
-      setUser(u);
-      setLoading(false);
+    let alive = true;
+
+    async function initAuth() {
+      try {
+        await setPersistence(auth, browserLocalPersistence);
+        await getRedirectResult(auth);
+      } catch (error) {
+        console.error("Redirect auth error:", error);
+      }
+
+      const unsubscribe = onAuthStateChanged(auth, (u) => {
+        if (!alive) return;
+        setUser(u);
+        setLoading(false);
+      });
+
+      return unsubscribe;
+    }
+
+    let unsubscribe: (() => void) | undefined;
+
+    initAuth().then((unsub) => {
+      unsubscribe = unsub;
     });
+
+    return () => {
+      alive = false;
+      unsubscribe?.();
+    };
   }, []);
 
-  const isAdmin = !!user && (ADMIN_EMAILS.includes(user.email ?? "") || ADMIN_EMAILS.includes("*"));
+  const isAdmin =
+    !!user &&
+    (ADMIN_EMAILS.includes(user.email?.toLowerCase() ?? "") ||
+      ADMIN_EMAILS.includes("*"));
 
   async function signInWithGoogle() {
-    await signInWithPopup(auth, googleProvider);
+    await setPersistence(auth, browserLocalPersistence);
+    await signInWithRedirect(auth, googleProvider);
   }
 
   async function logout() {
