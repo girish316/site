@@ -67,6 +67,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     </div>
   );
 
+  <div className="mt-4 text-left font-mono text-xs text-slate-400 bg-slate-50 border border-surface-200 rounded-lg p-3">
+  <div>loading: {String(loading)}</div>
+  <div>user: {user?.email ?? "none"}</div>
+  <div>isAdmin: {String(isAdmin)}</div>
+  <div>adminEnv: {process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "missing"}</div>
+  </div>
+
   return (
     <div className="min-h-screen flex bg-surface-50">
       {/* Sidebar */}
@@ -110,4 +117,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </main>
     </div>
   );
+
+  
+  
 }
+
