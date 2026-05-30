@@ -9,7 +9,7 @@ import {
   FileUp, LogOut, Settings, Loader2, Brain, Clock, ExternalLink
 } from "lucide-react";
 
-import { signInWithPopup } from "firebase/auth";
+import { signInWithPopup, signInWithRedirect } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
 
 const ADMIN_NAV = [
@@ -43,7 +43,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <button
             type="button"
             onClick={() => {
-              signInWithPopup(auth, googleProvider).catch(console.error);
+              signInWithRedirect(auth, googleProvider).catch(console.error);
             }}
             className="btn-primary w-full justify-center"
           >
