@@ -94,8 +94,10 @@ export interface SiteConfig {
 export interface SkillNode {
   id: string;
   label: string;
-  cat: "core" | "ai" | "robotics" | "web" | "learning";
+  cat: "core" | "ai" | "robotics" | "web" | "learning" | "systems";
   level: number;
   desc: string;
   order: number;
+  url?: string;
+  connections?: string[];
 }

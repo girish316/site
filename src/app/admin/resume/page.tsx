@@ -107,8 +107,9 @@ export default function AdminResumePage() {
                       <CheckCircle2 size={10} /> Active
                     </span>
                   )}
-                  <span className="font-mono text-xs text-slate-400">{formatBytes(r.size)}</span>
-                </div>
+                <span className="font-mono text-xs text-slate-400">
+                  {typeof r.size === "number" ? formatBytes(r.size) : "Unknown size"}
+                </span>                </div>
                 <div className="font-mono text-sm text-slate-700 truncate">{r.filename}</div>
                 <div className="font-mono text-xs text-slate-400 mt-0.5 flex items-center gap-1">
                   <Clock size={10} /> {formatDate(r.uploadedAt)}

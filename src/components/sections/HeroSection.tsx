@@ -21,14 +21,18 @@ export default function HeroSection({ config }: { config: SiteConfig | null }) {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d")!;
+
+    const canvasEl = canvas;
+    const ctx = canvasEl.getContext("2d")!;
+
     let W = 0, H = 0, raf = 0;
-    const particles: { x:number;y:number;vx:number;vy:number;r:number }[] = [];
+    const particles: { x:number; y:number; vx:number; vy:number; r:number }[] = [];
 
     function resize() {
-      W = canvas.width  = canvas.offsetWidth;
-      H = canvas.height = canvas.offsetHeight;
+      W = canvasEl.width = canvasEl.offsetWidth;
+      H = canvasEl.height = canvasEl.offsetHeight;
     }
+
     resize();
     window.addEventListener("resize", resize);
 

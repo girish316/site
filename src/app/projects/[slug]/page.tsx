@@ -13,8 +13,9 @@ export async function generateStaticParams() {
   return projects.map(p => ({ slug: p.slug }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const project = await getProjectBySlug(params.slug).catch(() => null);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const project = await getProjectBySlug(slug).catch(() => null);
   if (!project) return { title: "Project Not Found" };
   return {
     title: project.name,
@@ -23,8 +24,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function ProjectPage({ params }: { params: { slug: string } }) {
-  const project = await getProjectBySlug(params.slug).catch(() => null);
+export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const project = await getProjectBySlug(slug).catch(() => null);
   if (!project) notFound();
   const cat = CAT_COLORS[project.category] ?? CAT_COLORS.ai;
 
