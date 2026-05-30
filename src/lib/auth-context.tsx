@@ -1,6 +1,6 @@
 "use client";
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { User, onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
+import { User, onAuthStateChanged, signInWithRedirect, signOut } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
 
 interface AuthCtx {
@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAdmin = !!user && (ADMIN_EMAILS.includes(user.email ?? "") || ADMIN_EMAILS.includes("*"));
 
   async function signInWithGoogle() {
-    await signInWithPopup(auth, googleProvider);
+    await signInWithRedirect(auth, googleProvider);
   }
 
   async function logout() {
