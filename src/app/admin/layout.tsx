@@ -9,6 +9,9 @@ import {
   FileUp, LogOut, Settings, Loader2, Brain, Clock, ExternalLink
 } from "lucide-react";
 
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "@/lib/firebase";
+
 const ADMIN_NAV = [
   { href: "/admin",             label: "Dashboard",    icon: LayoutDashboard },
   { href: "/admin/config",      label: "Site Settings",   icon: Settings         },
@@ -37,9 +40,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="text-4xl mb-4">🔐</div>
         <h1 className="font-display font-bold text-2xl text-slate-900 mb-2">Admin Access</h1>
         <p className="text-slate-500 text-sm mb-6">Sign in with your Google account to manage content.</p>
-        <button onClick={signInWithGoogle} className="btn-primary w-full justify-center">
-          Sign in with Google
-        </button>
+          <button
+            type="button"
+            onClick={() => {
+              signInWithPopup(auth, googleProvider).catch(console.error);
+            }}
+            className="btn-primary w-full justify-center"
+          >
+            Sign in with Google
+          </button>
       </div>
     </div>
   );
