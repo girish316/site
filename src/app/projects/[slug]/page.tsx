@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getProjectBySlug, getProjects } from "@/lib/db";
+import { getProjectBySlug } from "@/lib/db";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProjectDemo from "@/components/ProjectDemo";
@@ -8,10 +8,7 @@ import { Github, ExternalLink, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
 
-export async function generateStaticParams() {
-  const projects = await getProjects().catch(() => []);
-  return projects.map(p => ({ slug: p.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
