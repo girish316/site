@@ -5,6 +5,7 @@ import type { Project, ProjectCategory } from "@/types";
 import { CAT_LABELS, cn } from "@/lib/utils";
 import { Plus, Pencil, Trash2, X, Save, Loader2, ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
+import RichEditor from "@/components/admin/RichEditor";
 
 const ALL_CATS: ProjectCategory[] = ["ai","robotics","systems","fullstack","hackathon","experimental"];
 
@@ -268,13 +269,14 @@ export default function AdminProjectsPage() {
           </Field>
 
           {/* Long description — plain textarea, no Tiptap */}
-          <Field label="Detailed Write-up" hint="Shown on the project detail page. Markdown supported.">
-            <textarea
-              value={editing.longDescription ?? ""}
-              onChange={e => setEditing(f => ({ ...f, longDescription: e.target.value }))}
-              placeholder={"## Overview\n\nDescribe your project in detail...\n\n## Challenges\n\n## Results"}
-              rows={10}
-              className="w-full border border-surface-200 rounded-xl px-3 py-2.5 text-sm font-mono text-slate-800 outline-none focus:border-brand-400 bg-white resize-y leading-relaxed"
+          <Field label="Detailed Write-up" hint="Shown on the project detail page. Rich editing supported.">
+            <RichEditor
+              content={editing.longDescription ?? ""}
+              contentType="html"
+              onChange={(v: string) =>
+                setEditing((f) => ({ ...f, longDescription: v }))
+              }
+              placeholder="Write a detailed project case study..."
             />
           </Field>
 

@@ -1,10 +1,11 @@
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
+// import Link from "next/link";
 import { Github, ExternalLink, Play, ChevronRight } from "lucide-react";
 import type { Project } from "@/types";
 import { CAT_LABELS, CAT_COLORS, cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const FILTERS = [
   { key: "all", label: "All" },
@@ -71,8 +72,13 @@ export default function ProjectsSection({ projects }: { projects: Project[] }) {
 }
 
 function ProjectCard({ project: p, index }: { project: Project; index: number }) {
+  const router = useRouter();
   const cat = CAT_COLORS[p.category] ?? CAT_COLORS.ai;
   const hasDemo = !!(p.demoVideo || (p.images && p.images.length > 0));
+
+  function openProject() {
+    router.push(`/projects/${p.slug}`);
+  }
 
   return (
     <motion.div
@@ -82,11 +88,22 @@ function ProjectCard({ project: p, index }: { project: Project; index: number })
       exit={{ opacity: 0, scale: .95 }}
       transition={{ duration: .35, delay: index * .05 }}
     >
-      <Link href={`/projects/${p.slug}`} className="group block card p-6 h-full hover:-translate-y-1">
-        {/* Cover image */}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={openProject}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") openProject();
+        }}
+        className="group block card p-6 h-full hover:-translate-y-1 cursor-pointer"
+      >
         {p.coverImage && (
           <div className="relative h-40 -mx-6 -mt-6 mb-5 overflow-hidden rounded-t-2xl bg-surface-100">
-            <img src={p.coverImage} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <img
+              src={p.coverImage}
+              alt={p.name}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
             {hasDemo && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity">
                 <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
@@ -97,19 +114,32 @@ function ProjectCard({ project: p, index }: { project: Project; index: number })
           </div>
         )}
 
-        {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <span className={cn("chip border", cat.bg, cat.text, cat.border)}>
             {CAT_LABELS[p.category]}
           </span>
-          <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity" onClick={e => e.preventDefault()}>
+
+          <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
             {p.githubUrl && (
-              <a href={p.githubUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg hover:bg-surface-100 text-slate-400 hover:text-slate-700 transition-colors">
+              <a
+                href={p.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="p-1.5 rounded-lg hover:bg-surface-100 text-slate-400 hover:text-slate-700 transition-colors"
+              >
                 <Github size={14} />
               </a>
             )}
+
             {p.liveUrl && (
-              <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg hover:bg-surface-100 text-slate-400 hover:text-slate-700 transition-colors">
+              <a
+                href={p.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="p-1.5 rounded-lg hover:bg-surface-100 text-slate-400 hover:text-slate-700 transition-colors"
+              >
                 <ExternalLink size={14} />
               </a>
             )}
@@ -119,17 +149,18 @@ function ProjectCard({ project: p, index }: { project: Project; index: number })
         <h3 className="font-display font-bold text-xl text-slate-900 mb-2 group-hover:text-brand-600 transition-colors">
           {p.name}
         </h3>
+
         <p className="font-mono text-sm text-slate-500 leading-relaxed mb-4 line-clamp-3">
           {p.description}
         </p>
 
-        {/* Stack */}
         <div className="flex flex-wrap gap-1.5 mb-4">
-          {p.stack.slice(0, 5).map(s => <span key={s} className="chip">{s}</span>)}
+          {p.stack.slice(0, 5).map((s) => (
+            <span key={s} className="chip">{s}</span>
+          ))}
           {p.stack.length > 5 && <span className="chip">+{p.stack.length - 5}</span>}
         </div>
 
-        {/* Metrics */}
         {p.metrics?.length > 0 && (
           <div className="flex gap-4 pt-3 border-t border-surface-100">
             {p.metrics.slice(0, 3).map((m, i) => (
@@ -144,7 +175,7 @@ function ProjectCard({ project: p, index }: { project: Project; index: number })
         <div className="mt-4 flex items-center gap-1 font-mono text-xs text-brand-500 opacity-0 group-hover:opacity-100 transition-opacity">
           View case study <ChevronRight size={12} />
         </div>
-      </Link>
+      </div>
     </motion.div>
   );
 }
