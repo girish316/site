@@ -55,7 +55,7 @@ export default function Navbar({ resumeUrl }: { resumeUrl?: string | null }) {
             <span className="status-dot" />
             <span>Available</span>
           </div>
-          <a href="/resume" target="_blank" rel="noopener noreferrer" className="btn-primary">
+          <a href="/resume" rel="noopener noreferrer" className="btn-primary">
               <Download size={14} /> Resume
             </a>
         </div>
@@ -83,7 +83,7 @@ export default function Navbar({ resumeUrl }: { resumeUrl?: string | null }) {
               {l.label}
             </Link>
           ))}
-          <a href="/resume" target="_blank" rel="noopener noreferrer" className="btn-primary mt-3 w-full justify-center">
+          <a href="/resume" rel="noopener noreferrer" className="btn-primary mt-3 w-full justify-center">
               <Download size={14} /> Resume
             </a>
         </div>
