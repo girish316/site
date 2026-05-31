@@ -1,15 +1,6 @@
 "use client";
-
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import {
-  User,
-  onAuthStateChanged,
-  signInWithRedirect,
-  getRedirectResult,
-  signOut,
-  browserLocalPersistence,
-  setPersistence,
-} from "firebase/auth";
+import { User, onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
 
 interface AuthCtx {
@@ -22,55 +13,34 @@ interface AuthCtx {
 
 const AuthContext = createContext<AuthCtx>({} as AuthCtx);
 
-const ADMIN_EMAILS = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "")
-  .split(",")
-  .map((e) => e.trim().toLowerCase())
-  .filter(Boolean);
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser]       = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let alive = true;
-
-    async function initAuth() {
-      try {
-        await setPersistence(auth, browserLocalPersistence);
-        await getRedirectResult(auth);
-      } catch (error) {
-        console.error("Redirect auth error:", error);
-      }
-
-      const unsubscribe = onAuthStateChanged(auth, (u) => {
-        if (!alive) return;
-        setUser(u);
-        setLoading(false);
-      });
-
-      return unsubscribe;
-    }
-
-    let unsubscribe: (() => void) | undefined;
-
-    initAuth().then((unsub) => {
-      unsubscribe = unsub;
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      setLoading(false);
     });
-
-    return () => {
-      alive = false;
-      unsubscribe?.();
-    };
+    return unsub;
   }, []);
 
+  // Read admin emails at call-time so hot-reload picks up .env changes
+  function getAdminEmails(): string[] {
+    const raw = process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "";
+    return raw.split(",").map(e => e.trim().toLowerCase()).filter(Boolean);
+  }
+
+  const adminEmails = getAdminEmails();
   const isAdmin =
     !!user &&
-    (ADMIN_EMAILS.includes(user.email?.toLowerCase() ?? "") ||
-      ADMIN_EMAILS.includes("*"));
+    (adminEmails.length === 0 ||        // if env is empty, allow any signed-in user
+     adminEmails.includes("*") ||
+     adminEmails.includes(user.email?.toLowerCase() ?? ""));
 
   async function signInWithGoogle() {
-    await setPersistence(auth, browserLocalPersistence);
-    await signInWithRedirect(auth, googleProvider);
+    // signInWithPopup works on localhost; signInWithRedirect requires HTTPS + proper domain
+    await signInWithPopup(auth, googleProvider);
   }
 
   async function logout() {
