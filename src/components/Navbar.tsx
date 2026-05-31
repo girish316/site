@@ -14,6 +14,7 @@ const NAV_LINKS = [
 ];
 
 export default function Navbar({ resumeUrl }: { resumeUrl?: string | null }) {
+  const resolvedResumeUrl = resumeUrl ?? "/api/resume";
   const [scrolled, setScrolled]   = useState(false);
   const [menuOpen, setMenuOpen]   = useState(false);
 
@@ -54,11 +55,9 @@ export default function Navbar({ resumeUrl }: { resumeUrl?: string | null }) {
             <span className="status-dot" />
             <span>Available</span>
           </div>
-          {resumeUrl && (
-            <a href={resumeUrl} target="_blank" rel="noopener noreferrer" className="btn-primary">
+          <a href={resolvedResumeUrl} target="_blank" rel="noopener noreferrer" className="btn-primary">
               <Download size={14} /> Resume
             </a>
-          )}
         </div>
 
         {/* Mobile hamburger */}
@@ -84,11 +83,9 @@ export default function Navbar({ resumeUrl }: { resumeUrl?: string | null }) {
               {l.label}
             </Link>
           ))}
-          {resumeUrl && (
-            <a href={resumeUrl} target="_blank" rel="noopener noreferrer" className="btn-primary mt-3 w-full justify-center">
+          <a href={resolvedResumeUrl} target="_blank" rel="noopener noreferrer" className="btn-primary mt-3 w-full justify-center">
               <Download size={14} /> Resume
             </a>
-          )}
         </div>
       )}
     </header>
